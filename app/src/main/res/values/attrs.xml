@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BarViewGroup">
+        <attr name="hasWeight" format="boolean" />
+        <attr name="layoutType" format="enum" >
+            <enum name="one_row" value="0" />
+            <enum name="two_rows" value="1" />
+        </attr>
+    </declare-styleable>
+</resources>
