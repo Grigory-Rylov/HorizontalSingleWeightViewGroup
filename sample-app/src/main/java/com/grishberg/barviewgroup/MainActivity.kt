@@ -3,6 +3,8 @@ package com.grishberg.barviewgroup
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.grishberg.strategyviewgroup.BarLayoutUpdater
+import com.grishberg.strategyviewgroup.BarViewGroup
 
 class MainActivity : AppCompatActivity() {
     private var twoRow: Boolean = false
