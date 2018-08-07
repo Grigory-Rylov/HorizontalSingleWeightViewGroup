@@ -66,7 +66,7 @@ class OneRowStrategy : LayoutStrategy {
             MeasureSpec.EXACTLY -> //Must be this size
                 maxHeight = heightSize
             MeasureSpec.AT_MOST -> //Can't be bigger than...
-                maxHeight = Math.min(0, heightSize)
+                maxHeight = Math.min(maxHeight, heightSize)
             MeasureSpec.UNSPECIFIED -> {
                 //Be whatever you want
                 //height = desiredHeight;
@@ -106,8 +106,8 @@ class OneRowStrategy : LayoutStrategy {
             tmpChildRect.top = parentTop + lp.topMargin
             tmpChildRect.bottom = parentBottom - lp.bottomMargin
             tmpChildRect.left = leftPos + lp.leftMargin
-            tmpChildRect.right = leftPos + width - lp.rightMargin
-            leftPos = tmpChildRect.right
+            tmpChildRect.right = tmpChildRect.left + width
+            leftPos = tmpChildRect.right + lp.rightMargin
 
             //tmpContainerRect.left = middleLeft + lp.leftMargin
             //tmpContainerRect.right = middleRight - lp.rightMargin

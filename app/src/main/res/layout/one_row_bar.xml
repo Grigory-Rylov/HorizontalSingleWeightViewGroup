@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.grishberg.barviewgroup.BarViewGroup
+    android:id="@+id/barView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    custom:layoutType="one_row">
+
+    <ImageButton
+        android:id="@+id/button1"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_dialog_info"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"/>
+
+    <ImageButton
+        android:id="@+id/button2"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_dialog_map"/>
+
+    <TextView
+        android:id="@+id/textBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="some text bar"
+        android:textAlignment="center"
+        custom:hasWeight="true"/>
+
+    <ImageButton
+        android:id="@+id/button3"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_dialog_dialer"/>
+
+    <ImageButton
+        android:id="@+id/button4"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_dialog_email"/>
+
+    <ImageButton
+        android:id="@+id/button5"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_dialog_alert"
+        android:layout_marginRight="12dp"
+        android:layout_marginEnd="12dp"/>
+</com.grishberg.barviewgroup.BarViewGroup>

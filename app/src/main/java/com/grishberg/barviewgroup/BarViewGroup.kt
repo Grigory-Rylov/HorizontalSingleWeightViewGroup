@@ -12,23 +12,57 @@ class BarViewGroup @JvmOverloads constructor(
         ctx: Context,
         attrs: AttributeSet? = null) : ViewGroup(ctx, attrs) {
     private var strategy: LayoutStrategy = LayoutStrategy.Stub()
-    private var layoutType: Int = 0
+    private var _layoutType: Int = 0
+    internal val layoutType: Int get() = _layoutType
+    private val oneRowStrategy = OneRowStrategy()
+    private val twoRowStrategy = TwoRowStrategy()
 
     init {
         if (attrs != null) {
-            val a = context.theme.obtainStyledAttributes(
-                    attrs,
-                    R.styleable.BarViewGroup,
-                    0, 0)
-
+            val a = context.theme.obtainStyledAttributes(attrs, R.styleable.BarViewGroup, 0, 0)
             try {
-                layoutType = a.getInteger(R.styleable.BarViewGroup_layoutType, 0)
+                _layoutType = a.getInteger(R.styleable.BarViewGroup_layoutType, 0)
             } finally {
                 a.recycle()
             }
         }
-        if (layoutType == LAYOUT_TYPE_ONE_ROW) {
-            strategy = OneRowStrategy()
+        strategy = defineStrategyByType(_layoutType)
+    }
+
+    private fun defineStrategyByType(type: Int): LayoutStrategy {
+        return if (type == LAYOUT_TYPE_ONE_ROW) {
+            oneRowStrategy
+        } else {
+            twoRowStrategy
+        }
+    }
+
+    fun changeLayoutType(newStrategy: LayoutStrategy,
+                         layoutParamMap: HashMap<Int, LayoutParams> = HashMap()) {
+        strategy = newStrategy
+        updateChildLayoutParams(layoutParamMap)
+        requestLayout()
+    }
+
+    fun changeLayoutType(type: Int,
+                         layoutParamMap: HashMap<Int, LayoutParams> = HashMap()) {
+        if (type == _layoutType || type < 0) {
+            return
+        }
+        _layoutType = type
+        strategy = defineStrategyByType(type)
+        updateChildLayoutParams(layoutParamMap)
+        requestLayout()
+    }
+
+    private fun updateChildLayoutParams(layoutParamMap: HashMap<Int, LayoutParams>) {
+        val count = childCount
+        for (i in 0 until count) {
+            val child = getChildAt(i)
+            val oldLp = layoutParamMap[child.id]
+            if (oldLp != null) {
+                child.layoutParams = oldLp
+            }
         }
     }
 
