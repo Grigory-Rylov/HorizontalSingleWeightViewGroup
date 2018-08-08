@@ -4,13 +4,15 @@ import android.content.Context
 import android.support.annotation.LayoutRes
 import android.view.LayoutInflater
 
-class BarLayoutUpdater {
+/**
+ * Updates BarViewGroup layout.
+ */
+class BarLayoutUpdater(val context: Context, @LayoutRes val layout: Int) {
     private var internalLayoutType: Int = -1
-    private val paramsMap = HashMap<Int, BarViewGroup.LayoutParams>()
+    private val paramsMap: HashMap<Int, BarViewGroup.LayoutParams> by lazy { prepareParamsMap() }
 
-    fun cloneFromLayout(context: Context, @LayoutRes layout: Int) {
-        paramsMap.clear()
-
+    private fun prepareParamsMap(): HashMap<Int, BarViewGroup.LayoutParams> {
+        val paramsMap = HashMap<Int, BarViewGroup.LayoutParams>()
         val view = LayoutInflater.from(context).inflate(layout, null, false)
         if (view is BarViewGroup) {
             internalLayoutType = view.layoutType
@@ -20,6 +22,7 @@ class BarLayoutUpdater {
                 paramsMap[child.id] = child.layoutParams as BarViewGroup.LayoutParams
             }
         }
+        return paramsMap
     }
 
     fun applyTo(barViewGroup: BarViewGroup) {

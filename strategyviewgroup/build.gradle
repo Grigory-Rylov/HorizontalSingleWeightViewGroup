@@ -4,6 +4,12 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+ext {
+    PUBLISH_GROUP_ID = 'com.github.grishberg'
+    PUBLISH_ARTIFACT_ID = 'strategyviewgroup'
+    PUBLISH_VERSION = '0.1.0'
+}
+
 android {
     compileSdkVersion 27
 
@@ -35,3 +41,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+//need to call  ./gradlew clean build generateRelease
+apply from: 'android-release-aar.gradle'
