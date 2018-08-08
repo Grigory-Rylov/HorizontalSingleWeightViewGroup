@@ -1,6 +1,7 @@
 package com.grishberg.strategyviewgroup
 
 import android.graphics.Rect
+import android.view.Gravity
 import android.view.View
 import android.view.View.*
 
@@ -8,7 +9,6 @@ import android.view.View.*
 class OneRowStrategy : LayoutStrategy {
 
     private var viewWithWeightWidth: Int = 0
-    private val tmpContainerRect = Rect()
     private val tmpChildRect = Rect()
 
     override fun onMeasure(parent: BarViewGroup,
@@ -37,6 +37,8 @@ class OneRowStrategy : LayoutStrategy {
             parent.measureChildWithMarginsEx(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
 
             val lp = child.layoutParams as (BarViewGroup.LayoutParams)
+            maxHeight = Math.max(maxHeight, child.measuredHeight + lp.topMargin + lp.bottomMargin)
+
             if (lp.hasWeight) {
                 viewWithWeight = child
                 continue
@@ -45,7 +47,6 @@ class OneRowStrategy : LayoutStrategy {
             totalChildWidth += child.measuredWidth
             totalChildMargins += lp.leftMargin + lp.rightMargin
 
-            maxHeight = Math.max(maxHeight, child.measuredHeight + lp.topMargin + lp.bottomMargin)
             childState = View.combineMeasuredStates(childState, child.measuredState)
         }
         //Measure Width
@@ -75,21 +76,20 @@ class OneRowStrategy : LayoutStrategy {
         maxWidth = Math.max(maxWidth, parent.getSuggestedMinimumWidthEx())
         if (viewWithWeight != null) {
             viewWithWeightWidth = maxWidth - (totalChildWidth + totalChildMargins)
+            parent.measureChildWithMarginsEx(viewWithWeight, widthMeasureSpec, 0, heightMeasureSpec, 0)
         }
 
         // Report our final dimensions.
         parent.setMeasuredDimensionEx(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
-                resolveSizeAndState(maxHeight, heightMeasureSpec,
-                        childState shl MEASURED_HEIGHT_STATE_SHIFT))
+                resolveSizeAndState(maxHeight, heightMeasureSpec, childState))
     }
 
     override fun onLayout(parent: BarViewGroup,
-                          changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+                          changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val count = parent.childCount
         var leftPos = parent.paddingLeft
-        val rightPos = r - l - parent.paddingRight
         val parentTop = parent.paddingTop
-        val parentBottom = b - t - parent.paddingBottom
+        val parentBottom = bottom - top - parent.paddingBottom
 
         for (i in 0 until count) {
             val child = parent.getChildAt(i)
@@ -99,13 +99,7 @@ class OneRowStrategy : LayoutStrategy {
             }
 
             val lp = child.layoutParams as (BarViewGroup.LayoutParams)
-            val width = child.measuredWidth
-            val height = child.measuredHeight
-
-            tmpChildRect.top = parentTop + lp.topMargin
-            tmpChildRect.bottom = parentBottom - lp.bottomMargin
-            tmpChildRect.left = leftPos + lp.leftMargin
-            tmpChildRect.right = tmpChildRect.left + width
+            calculateChildRect(child, parentTop, parentBottom, lp, leftPos)
             leftPos = tmpChildRect.right + lp.rightMargin
 
             //tmpContainerRect.left = middleLeft + lp.leftMargin
@@ -129,5 +123,34 @@ class OneRowStrategy : LayoutStrategy {
                     tmpChildRect.right,
                     tmpChildRect.bottom)
         }
+    }
+
+    private fun calculateChildRect(child: View, parentTop: Int, parentBottom: Int,
+                                   lp: BarViewGroup.LayoutParams, leftPos: Int) {
+        val width = child.measuredWidth
+        val childHeight = child.measuredHeight
+        val gravity = lp.gravity
+        // Space available for child
+        val horizontalChildSpace = parentBottom - parentTop - childHeight
+
+        when (gravity and Gravity.VERTICAL_GRAVITY_MASK) {
+            Gravity.TOP -> {
+                tmpChildRect.top = parentTop + lp.topMargin
+            }
+
+            Gravity.CENTER_VERTICAL -> {
+                tmpChildRect.top =
+                        (parentBottom - parentTop - (childHeight + lp.topMargin + lp.bottomMargin)) / 2
+            }
+            Gravity.BOTTOM -> {
+                tmpChildRect.top = parentBottom - childHeight - lp.bottomMargin
+            }
+            else -> tmpChildRect.top = parentTop + lp.topMargin
+        }
+
+        tmpChildRect.bottom = tmpChildRect.top + childHeight
+
+        tmpChildRect.left = leftPos + lp.leftMargin
+        tmpChildRect.right = tmpChildRect.left + width
     }
 }

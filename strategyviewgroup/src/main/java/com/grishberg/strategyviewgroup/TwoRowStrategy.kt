@@ -4,7 +4,6 @@ import android.graphics.Rect
 import android.view.View
 
 class TwoRowStrategy : LayoutStrategy {
-    private val tmpContainerRect = Rect()
     private val tmpChildRect = Rect()
     private var topViewHeight: Int = 0
     private var bottomViewHeight: Int = 0
@@ -47,6 +46,7 @@ class TwoRowStrategy : LayoutStrategy {
 
         if (topView != null) {
             topViewHeight = topView.measuredHeight
+            parent.measureChildWithMarginsEx(topView, widthMeasureSpec, 0, heightMeasureSpec, 0)
         }
         maxHeight = Math.max(topViewHeight + bottomViewHeight, parent.getSuggestedMinimumHeightEx())
         maxWidth = Math.max(maxWidth, parent.getSuggestedMinimumWidthEx())
@@ -61,11 +61,11 @@ class TwoRowStrategy : LayoutStrategy {
                 View.resolveSizeAndState(maxHeight, heightMeasureSpec, childState))
     }
 
-    override fun onLayout(parent: BarViewGroup, changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    override fun onLayout(parent: BarViewGroup, changed: Boolean,
+                          left: Int, top: Int, right: Int, bottom: Int) {
         val count = parent.childCount
         var leftPos = parent.paddingLeft
         val parentTop = parent.paddingTop
-        val parentBottom = b - t - parent.paddingBottom
 
         for (i in 0 until count) {
             val child = parent.getChildAt(i)
@@ -77,7 +77,7 @@ class TwoRowStrategy : LayoutStrategy {
             val lp = child.layoutParams as (BarViewGroup.LayoutParams)
 
             if (lp.hasWeight) {
-                child.layout(l, t, r, t + topViewHeight)
+                child.layout(left, top, right, top + topViewHeight)
                 continue
             }
 

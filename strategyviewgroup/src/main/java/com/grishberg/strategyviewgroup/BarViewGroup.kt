@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 
 private val LAYOUT_TYPE_ONE_ROW = 0
 private val LAYOUT_TYPE_TWO_ROWS = 1
@@ -119,7 +120,7 @@ class BarViewGroup @JvmOverloads constructor(
         return p is LayoutParams
     }
 
-    class LayoutParams : ViewGroup.MarginLayoutParams {
+    class LayoutParams : LinearLayout.LayoutParams {
         var hasWeight: Boolean = false
 
         constructor(c: Context, attrs: AttributeSet) : super(c, attrs) {
