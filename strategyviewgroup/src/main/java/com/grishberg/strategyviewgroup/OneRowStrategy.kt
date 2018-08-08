@@ -90,11 +90,13 @@ class OneRowStrategy : LayoutStrategy {
         var leftPos = parent.paddingLeft
         val parentTop = parent.paddingTop
         val parentBottom = bottom - top - parent.paddingBottom
+        var prevChildGone = false
 
         for (i in 0 until count) {
             val child = parent.getChildAt(i)
 
             if (child.visibility == View.GONE) {
+                prevChildGone = true
                 continue
             }
 
@@ -130,8 +132,6 @@ class OneRowStrategy : LayoutStrategy {
         val width = child.measuredWidth
         val childHeight = child.measuredHeight
         val gravity = lp.gravity
-        // Space available for child
-        val horizontalChildSpace = parentBottom - parentTop - childHeight
 
         when (gravity and Gravity.VERTICAL_GRAVITY_MASK) {
             Gravity.TOP -> {

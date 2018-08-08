@@ -8,15 +8,14 @@ import com.grishberg.strategyviewgroup.BarViewGroup
 
 class MainActivity : AppCompatActivity() {
     private var twoRow: Boolean = false
-    private val oneRowLayoutUpdater = BarLayoutUpdater()
-    private val twoRowsLayoutUpdater = BarLayoutUpdater()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        oneRowLayoutUpdater.cloneFromLayout(this, R.layout.one_row_bar)
-        twoRowsLayoutUpdater.cloneFromLayout(this, R.layout.two_row_bar)
+        val oneRowLayoutUpdater = BarLayoutUpdater(this, R.layout.one_row_bar)
+        val twoRowsLayoutUpdater = BarLayoutUpdater(this, R.layout.two_row_bar)
 
         val rootView = findViewById<View>(R.id.root)
         val barView = findViewById<BarViewGroup>(R.id.barView)
