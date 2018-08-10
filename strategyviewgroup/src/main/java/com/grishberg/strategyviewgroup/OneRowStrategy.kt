@@ -21,11 +21,11 @@ class OneRowStrategy : LayoutStrategy {
 
         val count = parent.childCount
         var viewWithWeight: View? = null
-        var maxWidth: Int = 0
-        var maxHeight: Int = 0
-        var totalChildWidth: Int = 0
-        var totalChildMargins: Int = 0
-        var childState: Int = 0
+        var maxWidth = 0
+        var maxHeight = 0
+        var totalChildWidth = 0
+        var totalChildMargins = 0
+        var childState = 0
 
 
         for (i in 0 until count) {
@@ -35,15 +35,14 @@ class OneRowStrategy : LayoutStrategy {
                 continue
             }
 
-            parent.measureChildWithMarginsEx(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
-
             val lp = child.layoutParams as (BarViewGroup.LayoutParams)
-            maxHeight = Math.max(maxHeight, child.measuredHeight + lp.topMargin + lp.bottomMargin)
 
             if (lp.hasWeight) {
                 viewWithWeight = child
                 continue
             }
+            parent.measureChildWithMarginsEx(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
+            maxHeight = Math.max(maxHeight, child.measuredHeight + lp.topMargin + lp.bottomMargin)
 
             totalChildWidth += child.measuredWidth
             totalChildMargins += lp.leftMargin + lp.rightMargin
@@ -73,15 +72,17 @@ class OneRowStrategy : LayoutStrategy {
                 //height = desiredHeight;
             }
         }
-        maxHeight = Math.max(maxHeight, parent.getSuggestedMinimumHeightEx())
-        maxWidth = Math.max(maxWidth, parent.getSuggestedMinimumWidthEx())
         if (viewWithWeight != null) {
             viewWithWeightWidth = maxWidth - (totalChildWidth + totalChildMargins)
 
             val childWidthMeasureSpec = ViewGroup.getChildMeasureSpec(widthMeasureSpec, 0, viewWithWeightWidth)
             val childHeightMeasureSpec = ViewGroup.getChildMeasureSpec(heightMeasureSpec, 0, maxHeight)
             viewWithWeight.measure(childWidthMeasureSpec, childHeightMeasureSpec)
+            maxHeight = Math.max(maxHeight, viewWithWeight.measuredHeight)
         }
+
+        maxHeight = Math.max(maxHeight, parent.getSuggestedMinimumHeightEx())
+        maxWidth = Math.max(maxWidth, parent.getSuggestedMinimumWidthEx())
 
         // Report our final dimensions.
         parent.setMeasuredDimensionEx(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
@@ -108,11 +109,6 @@ class OneRowStrategy : LayoutStrategy {
             calculateChildRect(child, parentTop, parentBottom, lp, leftPos, prevChildGone)
             prevChildGone = false
             leftPos = tmpChildRect.right + lp.rightMargin
-
-            //tmpContainerRect.left = middleLeft + lp.leftMargin
-            //tmpContainerRect.right = middleRight - lp.rightMargin
-
-            //Gravity.apply(lp.gravity, width, height, mTmpContainerRect, mTmpChildRect);
 
             if (lp.hasWeight) {
                 tmpChildRect.right = tmpChildRect.left + viewWithWeightWidth

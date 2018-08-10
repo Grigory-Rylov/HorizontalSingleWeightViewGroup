@@ -31,13 +31,14 @@ class TwoRowStrategy : LayoutStrategy {
                 continue
             }
 
-            parent.measureChildWithMarginsEx(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
             val lp = child.layoutParams as BarViewGroup.LayoutParams
 
             if (lp.hasWeight) {
                 topView = child
                 continue
             }
+
+            parent.measureChildWithMarginsEx(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
 
             buttonsCount++
             bottomViewHeight = Math.max(bottomViewHeight,
@@ -51,6 +52,7 @@ class TwoRowStrategy : LayoutStrategy {
             val childHeightMeasureSpec = ViewGroup.getChildMeasureSpec(heightMeasureSpec, 0, topViewHeight)
             topView.measure(childWidthMeasureSpec, childHeightMeasureSpec)
         }
+
         maxHeight = Math.max(topViewHeight + bottomViewHeight, parent.getSuggestedMinimumHeightEx())
         maxWidth = Math.max(maxWidth, parent.getSuggestedMinimumWidthEx())
 
