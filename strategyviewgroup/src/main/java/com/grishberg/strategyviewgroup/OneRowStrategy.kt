@@ -27,9 +27,14 @@ class OneRowStrategy : LayoutStrategy {
         var totalChildMargins = 0
         var childState = 0
 
-
+        val isRtl = parent.isRtl
         for (i in 0 until count) {
-            val child = parent.getChildAt(i)
+            val childIndex = if (isRtl) {
+                count - i - 1
+            } else {
+                i
+            }
+            val child = parent.getChildAt(childIndex)
 
             if (child.visibility == View.GONE) {
                 continue
@@ -97,8 +102,14 @@ class OneRowStrategy : LayoutStrategy {
         val parentBottom = bottom - top - parent.paddingBottom
         var prevChildGone = false
 
+        val isRtl = parent.isRtl
         for (i in 0 until count) {
-            val child = parent.getChildAt(i)
+            val childIndex = if (isRtl) {
+                count - i - 1
+            } else {
+                i
+            }
+            val child = parent.getChildAt(childIndex)
 
             if (child.visibility == View.GONE) {
                 prevChildGone = true

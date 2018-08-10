@@ -16,17 +16,22 @@ class TwoRowStrategy : LayoutStrategy {
         val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
         val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
 
-        var maxHeight: Int = 0
-        var childState: Int = 0
+        var maxHeight = 0
+        var childState = 0
         val count = parent.childCount
         var topView: View? = null
-        var buttonsCount: Int = 0
-        var totalMargins: Int = 0
+        var buttonsCount = 0
+        var totalMargins = 0
 
-
+        val isRtl = parent.isRtl
         for (i in 0 until count) {
-            val child = parent.getChildAt(i)
+            val childIndex = if (isRtl) {
+                count - i - 1
+            } else {
+                i
+            }
 
+            val child = parent.getChildAt(childIndex)
             if (child.visibility == View.GONE) {
                 continue
             }
@@ -72,8 +77,14 @@ class TwoRowStrategy : LayoutStrategy {
         var leftPos = parent.paddingLeft
         val parentTop = parent.paddingTop
 
+        val isRtl = parent.isRtl
         for (i in 0 until count) {
-            val child = parent.getChildAt(i)
+            val childIndex = if (isRtl) {
+                count - i - 1
+            } else {
+                i
+            }
+            val child = parent.getChildAt(childIndex)
 
             if (child.visibility == View.GONE) {
                 continue

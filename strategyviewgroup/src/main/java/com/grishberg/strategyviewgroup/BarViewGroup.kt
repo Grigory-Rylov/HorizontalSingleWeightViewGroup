@@ -1,6 +1,8 @@
 package com.grishberg.strategyviewgroup
 
 import android.content.Context
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.JELLY_BEAN
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +19,7 @@ class BarViewGroup @JvmOverloads constructor(
     internal val layoutType: Int get() = _layoutType
     private val oneRowStrategy = OneRowStrategy()
     private val twoRowStrategy = TwoRowStrategy()
+    internal val isRtl = isRTL(ctx)
 
     init {
         if (attrs != null) {
@@ -28,6 +31,14 @@ class BarViewGroup @JvmOverloads constructor(
             }
         }
         strategy = defineStrategyByType(_layoutType)
+    }
+
+    private fun isRTL(ctx: Context): Boolean {
+        if (SDK_INT > JELLY_BEAN) {
+            val config = ctx.resources.configuration
+            return config.layoutDirection == View.LAYOUT_DIRECTION_RTL
+        }
+        return false
     }
 
     private fun defineStrategyByType(type: Int): LayoutStrategy {
