@@ -6,8 +6,8 @@
             <enum name="one_row" value="0" />
             <enum name="two_rows" value="1" />
         </attr>
-        <attr name="goneMarginStart" format="float" />
-        <attr name="goneMarginEnd" format="float" />
-        <attr name="goneMarginTop" format="float" />
+        <attr name="goneMarginStart" format="dimension" />
+        <attr name="goneMarginEnd" format="dimension" />
+        <attr name="goneMarginTop" format="dimension" />
     </declare-styleable>
 </resources>

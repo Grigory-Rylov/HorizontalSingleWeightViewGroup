@@ -122,6 +122,7 @@ class BarViewGroup @JvmOverloads constructor(
 
     class LayoutParams : LinearLayout.LayoutParams {
         var hasWeight: Boolean = false
+        var goneMarginStart: Float = -1.0f
 
         constructor(c: Context, attrs: AttributeSet) : super(c, attrs) {
 
@@ -131,6 +132,7 @@ class BarViewGroup @JvmOverloads constructor(
             val typedArray = c.obtainStyledAttributes(attrs, R.styleable.BarViewGroup)
             try {
                 hasWeight = typedArray.getBoolean(R.styleable.BarViewGroup_hasWeight, false)
+                goneMarginStart = typedArray.getDimension(R.styleable.BarViewGroup_goneMarginStart, -1.0f)
             } finally {
                 typedArray.recycle()
             }

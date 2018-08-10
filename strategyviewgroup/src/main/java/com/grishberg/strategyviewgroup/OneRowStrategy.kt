@@ -4,6 +4,7 @@ import android.graphics.Rect
 import android.view.Gravity
 import android.view.View
 import android.view.View.*
+import android.view.ViewGroup
 
 
 class OneRowStrategy : LayoutStrategy {
@@ -76,7 +77,10 @@ class OneRowStrategy : LayoutStrategy {
         maxWidth = Math.max(maxWidth, parent.getSuggestedMinimumWidthEx())
         if (viewWithWeight != null) {
             viewWithWeightWidth = maxWidth - (totalChildWidth + totalChildMargins)
-            parent.measureChildWithMarginsEx(viewWithWeight, widthMeasureSpec, 0, heightMeasureSpec, 0)
+
+            val childWidthMeasureSpec = ViewGroup.getChildMeasureSpec(widthMeasureSpec, 0, viewWithWeightWidth)
+            val childHeightMeasureSpec = ViewGroup.getChildMeasureSpec(heightMeasureSpec, 0, maxHeight)
+            viewWithWeight.measure(childWidthMeasureSpec, childHeightMeasureSpec)
         }
 
         // Report our final dimensions.
@@ -101,7 +105,8 @@ class OneRowStrategy : LayoutStrategy {
             }
 
             val lp = child.layoutParams as (BarViewGroup.LayoutParams)
-            calculateChildRect(child, parentTop, parentBottom, lp, leftPos)
+            calculateChildRect(child, parentTop, parentBottom, lp, leftPos, prevChildGone)
+            prevChildGone = false
             leftPos = tmpChildRect.right + lp.rightMargin
 
             //tmpContainerRect.left = middleLeft + lp.leftMargin
@@ -128,10 +133,16 @@ class OneRowStrategy : LayoutStrategy {
     }
 
     private fun calculateChildRect(child: View, parentTop: Int, parentBottom: Int,
-                                   lp: BarViewGroup.LayoutParams, leftPos: Int) {
+                                   lp: BarViewGroup.LayoutParams, leftPos: Int,
+                                   prevChildGone: Boolean) {
         val width = child.measuredWidth
         val childHeight = child.measuredHeight
         val gravity = lp.gravity
+        val leftMargin: Int = if (prevChildGone) {
+            Math.round(lp.goneMarginStart)
+        } else {
+            lp.leftMargin
+        }
 
         when (gravity and Gravity.VERTICAL_GRAVITY_MASK) {
             Gravity.TOP -> {
@@ -150,7 +161,7 @@ class OneRowStrategy : LayoutStrategy {
 
         tmpChildRect.bottom = tmpChildRect.top + childHeight
 
-        tmpChildRect.left = leftPos + lp.leftMargin
+        tmpChildRect.left = leftPos + leftMargin
         tmpChildRect.right = tmpChildRect.left + width
     }
 }

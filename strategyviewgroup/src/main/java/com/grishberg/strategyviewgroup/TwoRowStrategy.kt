@@ -2,6 +2,7 @@ package com.grishberg.strategyviewgroup
 
 import android.graphics.Rect
 import android.view.View
+import android.view.ViewGroup
 
 class TwoRowStrategy : LayoutStrategy {
     private val tmpChildRect = Rect()
@@ -46,7 +47,9 @@ class TwoRowStrategy : LayoutStrategy {
 
         if (topView != null) {
             topViewHeight = topView.measuredHeight
-            parent.measureChildWithMarginsEx(topView, widthMeasureSpec, 0, heightMeasureSpec, 0)
+            val childWidthMeasureSpec = ViewGroup.getChildMeasureSpec(widthMeasureSpec, 0, maxWidth)
+            val childHeightMeasureSpec = ViewGroup.getChildMeasureSpec(heightMeasureSpec, 0, topViewHeight)
+            topView.measure(childWidthMeasureSpec, childHeightMeasureSpec)
         }
         maxHeight = Math.max(topViewHeight + bottomViewHeight, parent.getSuggestedMinimumHeightEx())
         maxWidth = Math.max(maxWidth, parent.getSuggestedMinimumWidthEx())

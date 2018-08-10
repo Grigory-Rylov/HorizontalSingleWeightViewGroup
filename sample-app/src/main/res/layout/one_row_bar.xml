@@ -15,6 +15,7 @@
         android:layout_gravity="top"
         android:layout_marginLeft="12dp"
         android:layout_marginStart="12dp"
+        android:visibility="gone"
         android:src="@android:drawable/ic_dialog_info"
         />
 
@@ -22,6 +23,7 @@
         android:id="@+id/button2"
         android:layout_width="36dp"
         android:layout_height="36dp"
+        custom:goneMarginStart="12dp"
         android:layout_gravity="center_vertical"
         android:src="@android:drawable/ic_dialog_map"/>
 
@@ -30,7 +32,8 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:background="#85d280"
-        android:text="some text bar"
+        android:text="some text bar 1234567"
+        android:gravity="center"
         android:textAlignment="center"
         custom:hasWeight="true"/>
 

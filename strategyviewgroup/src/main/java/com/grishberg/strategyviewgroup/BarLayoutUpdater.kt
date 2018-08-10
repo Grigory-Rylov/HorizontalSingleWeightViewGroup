@@ -7,11 +7,11 @@ import android.view.LayoutInflater
 /**
  * Updates BarViewGroup layout.
  */
-class BarLayoutUpdater(val context: Context, @LayoutRes val layout: Int) {
-    private var internalLayoutType: Int = -1
-    private val paramsMap: HashMap<Int, BarViewGroup.LayoutParams> by lazy { prepareParamsMap() }
+class BarLayoutUpdater(private val context: Context, @LayoutRes val layout: Int) {
+    private val params: UpdateParams by lazy { prepareParamsMap() }
 
-    private fun prepareParamsMap(): HashMap<Int, BarViewGroup.LayoutParams> {
+    private fun prepareParamsMap(): UpdateParams {
+        var internalLayoutType = 0
         val paramsMap = HashMap<Int, BarViewGroup.LayoutParams>()
         val view = LayoutInflater.from(context).inflate(layout, null, false)
         if (view is BarViewGroup) {
@@ -22,14 +22,17 @@ class BarLayoutUpdater(val context: Context, @LayoutRes val layout: Int) {
                 paramsMap[child.id] = child.layoutParams as BarViewGroup.LayoutParams
             }
         }
-        return paramsMap
+        return UpdateParams(internalLayoutType, paramsMap)
     }
 
     fun applyTo(barViewGroup: BarViewGroup) {
-        barViewGroup.changeLayoutType(internalLayoutType, paramsMap)
+        barViewGroup.changeLayoutType(params.internalLayoutType, params.paramsMap)
     }
 
     fun applywithStrategy(barViewGroup: BarViewGroup, strategy: LayoutStrategy) {
-        barViewGroup.changeLayoutType(strategy, paramsMap)
+        barViewGroup.changeLayoutType(strategy, params.paramsMap)
     }
+
+    private data class UpdateParams(val internalLayoutType: Int,
+                                    val paramsMap: HashMap<Int, BarViewGroup.LayoutParams>)
 }
