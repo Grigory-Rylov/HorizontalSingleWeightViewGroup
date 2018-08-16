@@ -11,10 +11,8 @@ class TwoRowStrategy : LayoutStrategy {
     private var bottomItemWidth: Int = 0
 
     override fun onMeasure(parent: BarViewGroup, widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val widthMode = View.MeasureSpec.getMode(widthMeasureSpec)
         var maxWidth = View.MeasureSpec.getSize(widthMeasureSpec)
         val heightMode = View.MeasureSpec.getMode(heightMeasureSpec)
-        val heightSize = View.MeasureSpec.getSize(heightMeasureSpec)
 
         var maxHeight = 0
         var childState = 0
@@ -23,14 +21,7 @@ class TwoRowStrategy : LayoutStrategy {
         var buttonsCount = 0
         var totalMargins = 0
 
-        val isRtl = parent.isRtl
-        for (i in 0 until count) {
-            val childIndex = if (isRtl) {
-                count - i - 1
-            } else {
-                i
-            }
-
+        for (childIndex in 0 until count) {
             val child = parent.getChildAt(childIndex)
             if (child.visibility == View.GONE) {
                 continue
@@ -52,10 +43,14 @@ class TwoRowStrategy : LayoutStrategy {
         }
 
         if (topView != null) {
-            topViewHeight = topView.measuredHeight
             val childWidthMeasureSpec = ViewGroup.getChildMeasureSpec(widthMeasureSpec, 0, maxWidth)
-            val childHeightMeasureSpec = ViewGroup.getChildMeasureSpec(heightMeasureSpec, 0, topViewHeight)
+            val childHeightMeasureSpec = if (heightMode == View.MeasureSpec.UNSPECIFIED) {
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            } else {
+                ViewGroup.getChildMeasureSpec(heightMeasureSpec, 0, topView.layoutParams.height)
+            }
             topView.measure(childWidthMeasureSpec, childHeightMeasureSpec)
+            topViewHeight = topView.measuredHeight
         }
 
         maxHeight = Math.max(topViewHeight + bottomViewHeight, parent.getSuggestedMinimumHeightEx())
@@ -77,13 +72,7 @@ class TwoRowStrategy : LayoutStrategy {
         var leftPos = parent.paddingLeft
         val parentTop = parent.paddingTop
 
-        val isRtl = parent.isRtl
-        for (i in 0 until count) {
-            val childIndex = if (isRtl) {
-                count - i - 1
-            } else {
-                i
-            }
+        for (childIndex in 0 until count) {
             val child = parent.getChildAt(childIndex)
 
             if (child.visibility == View.GONE) {

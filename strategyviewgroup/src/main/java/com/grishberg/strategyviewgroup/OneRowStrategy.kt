@@ -5,12 +5,15 @@ import android.view.Gravity
 import android.view.View
 import android.view.View.*
 import android.view.ViewGroup
+import android.view.ViewGroup.getChildMeasureSpec
 
 
 class OneRowStrategy : LayoutStrategy {
 
-    private var viewWithWeightWidth: Int = 0
+    private var stretchableViewWidth: Int = 0
     private val tmpChildRect = Rect()
+    private var maxMeasuredWidth = 0
+    private var maxMeasuredHeight = 0
 
     override fun onMeasure(parent: BarViewGroup,
                            widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -20,20 +23,13 @@ class OneRowStrategy : LayoutStrategy {
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
         val count = parent.childCount
-        var viewWithWeight: View? = null
-        var maxWidth = 0
-        var maxHeight = 0
+        var stretchableView: View? = null
         var totalChildWidth = 0
         var totalChildMargins = 0
         var childState = 0
 
-        val isRtl = parent.isRtl
-        for (i in 0 until count) {
-            val childIndex = if (isRtl) {
-                count - i - 1
-            } else {
-                i
-            }
+        for (childIndex in 0 until count) {
+
             val child = parent.getChildAt(childIndex)
 
             if (child.visibility == View.GONE) {
@@ -43,55 +39,82 @@ class OneRowStrategy : LayoutStrategy {
             val lp = child.layoutParams as (BarViewGroup.LayoutParams)
 
             if (lp.hasWeight) {
-                viewWithWeight = child
+                stretchableView = child
                 continue
             }
             parent.measureChildWithMarginsEx(child, widthMeasureSpec, 0, heightMeasureSpec, 0)
-            maxHeight = Math.max(maxHeight, child.measuredHeight + lp.topMargin + lp.bottomMargin)
+            val measuredChildHeightWithMargins = child.measuredHeight + lp.topMargin + lp.bottomMargin
+            maxMeasuredHeight = Math.max(maxMeasuredHeight, measuredChildHeightWithMargins)
 
             totalChildWidth += child.measuredWidth
             totalChildMargins += lp.leftMargin + lp.rightMargin
 
             childState = View.combineMeasuredStates(childState, child.measuredState)
         }
-        //Measure Width
-        when (widthMode) {
-            MeasureSpec.EXACTLY -> //Must be this size
-                maxWidth = widthSize
-            MeasureSpec.AT_MOST -> //Can't be bigger than...
-                maxWidth = Math.min(parent.layoutParams.width, widthSize)
-            MeasureSpec.UNSPECIFIED -> {
-                //Be whatever you want
-                //maxWidth = desiredWidth
-            }
+
+        updateMaxMeasuredWidthFromMeasureSpec(widthMode, widthSize, parent)
+
+        updateMaxMeasureHeightFromMeasureSpec(heightMode, heightSize)
+
+        if (stretchableView != null) {
+            measureStretchableView(stretchableView, totalChildWidth, totalChildMargins,
+                    widthMeasureSpec, heightMeasureSpec, heightMode)
+            maxMeasuredHeight = Math.max(maxMeasuredHeight, stretchableView.measuredHeight)
         }
 
-        //Measure Height
+        maxMeasuredHeight = Math.max(maxMeasuredHeight, parent.getSuggestedMinimumHeightEx())
+        maxMeasuredWidth = Math.max(maxMeasuredWidth, parent.getSuggestedMinimumWidthEx())
+
+        // Report our final dimensions.
+        parent.setMeasuredDimensionEx(resolveSizeAndState(maxMeasuredWidth, widthMeasureSpec, childState),
+                resolveSizeAndState(maxMeasuredHeight, heightMeasureSpec, childState))
+    }
+
+    private fun measureStretchableView(stretchableView: View,
+                                       totalChildWidth: Int,
+                                       totalChildMargins: Int,
+                                       widthMeasureSpec: Int,
+                                       heightMeasureSpec: Int,
+                                       heightMode: Int) {
+        val lp = stretchableView.layoutParams
+        stretchableViewWidth = maxMeasuredWidth - (totalChildWidth + totalChildMargins)
+
+        val childWidthMeasureSpec = getChildMeasureSpec(widthMeasureSpec, 0, stretchableViewWidth)
+        val childHeightMeasureSpec = if (heightMode == MeasureSpec.UNSPECIFIED) {
+            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+        } else if (lp.height == ViewGroup.LayoutParams.MATCH_PARENT) {
+            getChildMeasureSpec(heightMeasureSpec, 0, maxMeasuredHeight)
+        } else {
+            getChildMeasureSpec(heightMeasureSpec, 0, stretchableView.layoutParams.height)
+        }
+
+        stretchableView.measure(childWidthMeasureSpec, childHeightMeasureSpec)
+    }
+
+    private fun updateMaxMeasureHeightFromMeasureSpec(heightMode: Int, heightSize: Int) {
         when (heightMode) {
             MeasureSpec.EXACTLY -> //Must be this size
-                maxHeight = heightSize
+                maxMeasuredHeight = heightSize
             MeasureSpec.AT_MOST -> //Can't be bigger than...
-                maxHeight = Math.min(maxHeight, heightSize)
+                maxMeasuredHeight = Math.min(maxMeasuredHeight, heightSize)
             MeasureSpec.UNSPECIFIED -> {
                 //Be whatever you want
                 //height = desiredHeight;
             }
         }
-        if (viewWithWeight != null) {
-            viewWithWeightWidth = maxWidth - (totalChildWidth + totalChildMargins)
+    }
 
-            val childWidthMeasureSpec = ViewGroup.getChildMeasureSpec(widthMeasureSpec, 0, viewWithWeightWidth)
-            val childHeightMeasureSpec = ViewGroup.getChildMeasureSpec(heightMeasureSpec, 0, maxHeight)
-            viewWithWeight.measure(childWidthMeasureSpec, childHeightMeasureSpec)
-            maxHeight = Math.max(maxHeight, viewWithWeight.measuredHeight)
+    private fun updateMaxMeasuredWidthFromMeasureSpec(widthMode: Int, widthSize: Int, parent: BarViewGroup) {
+        when (widthMode) {
+            MeasureSpec.EXACTLY -> //Must be this size
+                maxMeasuredWidth = widthSize
+            MeasureSpec.AT_MOST -> //Can't be bigger than...
+                maxMeasuredWidth = Math.min(parent.layoutParams.width, widthSize)
+            MeasureSpec.UNSPECIFIED -> {
+                //Be whatever you want
+                //maxWidth = desiredWidth
+            }
         }
-
-        maxHeight = Math.max(maxHeight, parent.getSuggestedMinimumHeightEx())
-        maxWidth = Math.max(maxWidth, parent.getSuggestedMinimumWidthEx())
-
-        // Report our final dimensions.
-        parent.setMeasuredDimensionEx(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
-                resolveSizeAndState(maxHeight, heightMeasureSpec, childState))
     }
 
     override fun onLayout(parent: BarViewGroup,
@@ -102,13 +125,7 @@ class OneRowStrategy : LayoutStrategy {
         val parentBottom = bottom - top - parent.paddingBottom
         var prevChildGone = false
 
-        val isRtl = parent.isRtl
-        for (i in 0 until count) {
-            val childIndex = if (isRtl) {
-                count - i - 1
-            } else {
-                i
-            }
+        for (childIndex in 0 until count) {
             val child = parent.getChildAt(childIndex)
 
             if (child.visibility == View.GONE) {
@@ -117,19 +134,14 @@ class OneRowStrategy : LayoutStrategy {
             }
 
             val lp = child.layoutParams as (BarViewGroup.LayoutParams)
-            calculateChildRect(child, parentTop, parentBottom, lp, leftPos, prevChildGone)
+            calculateChildRectForLayout(child, parentTop, parentBottom, lp, leftPos, prevChildGone)
             prevChildGone = false
-            leftPos = tmpChildRect.right + lp.rightMargin
 
             if (lp.hasWeight) {
-                tmpChildRect.right = tmpChildRect.left + viewWithWeightWidth
-                leftPos = tmpChildRect.right
-                child.layout(tmpChildRect.left,
-                        tmpChildRect.top,
-                        tmpChildRect.right,
-                        tmpChildRect.bottom)
-                continue
+                tmpChildRect.right = tmpChildRect.left + stretchableViewWidth
             }
+
+            leftPos = tmpChildRect.right + lp.rightMargin
 
             // Place the child.
             child.layout(tmpChildRect.left,
@@ -139,9 +151,9 @@ class OneRowStrategy : LayoutStrategy {
         }
     }
 
-    private fun calculateChildRect(child: View, parentTop: Int, parentBottom: Int,
-                                   lp: BarViewGroup.LayoutParams, leftPos: Int,
-                                   prevChildGone: Boolean) {
+    private fun calculateChildRectForLayout(child: View, parentTop: Int, parentBottom: Int,
+                                            lp: BarViewGroup.LayoutParams, leftPos: Int,
+                                            prevChildGone: Boolean) {
         val width = child.measuredWidth
         val childHeight = child.measuredHeight
         val gravity = lp.gravity

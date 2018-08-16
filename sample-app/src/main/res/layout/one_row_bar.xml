@@ -30,7 +30,7 @@
     <TextView
         android:id="@+id/textBar"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="match_parent"
         android:background="#85d280"
         android:text="some text bar 1234567"
         android:gravity="center"
