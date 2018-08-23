@@ -33,6 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="52dp"
         android:text="some text bar"
+        android:gravity="center"
         android:textAlignment="center"
         custom:hasWeight="true"/>
 
