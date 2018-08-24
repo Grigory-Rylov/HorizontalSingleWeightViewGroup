@@ -6,7 +6,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:animateLayoutChanges="true"
     custom:layoutType="one_row">
 
     <ImageButton
@@ -28,14 +27,13 @@
         android:layout_gravity="center_vertical"
         android:src="@android:drawable/ic_dialog_map"/>
 
-    <TextView
+    <Button
         android:id="@+id/textBar"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:background="#85d280"
         android:text="some text bar 1234567"
         android:gravity="center"
-        android:textAlignment="center"
         custom:hasWeight="true"/>
 
     <ImageButton

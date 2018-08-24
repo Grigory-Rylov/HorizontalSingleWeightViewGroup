@@ -3,12 +3,12 @@ package com.grishberg.barviewgroup
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.transition.TransitionManager
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import com.grishberg.strategyviewgroup.BarLayoutUpdater
 import com.grishberg.strategyviewgroup.BarViewGroup
+import com.transitionseverywhere.TransitionManager
 
 class MainActivity : AppCompatActivity() {
     private var twoRow: Boolean = false
@@ -28,9 +28,8 @@ class MainActivity : AppCompatActivity() {
         twoRowsLayoutUpdater.applyTo(barView)
         rootView.setOnClickListener {
             twoRow = !twoRow
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                TransitionManager.beginDelayedTransition(barView)
-            }
+
+            TransitionManager.beginDelayedTransition(barView)
             barView.removeView(button1)
             barView.removeView(button5)
             if (twoRow) {
