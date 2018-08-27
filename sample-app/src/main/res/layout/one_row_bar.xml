@@ -15,25 +15,24 @@
         android:layout_gravity="top"
         android:layout_marginLeft="12dp"
         android:layout_marginStart="12dp"
-        android:visibility="visible"
         android:src="@android:drawable/ic_dialog_info"
+        android:visibility="visible"
         />
 
     <ImageButton
         android:id="@+id/button2"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        custom:goneMarginStart="12dp"
         android:layout_gravity="center_vertical"
-        android:src="@android:drawable/ic_dialog_map"/>
+        android:src="@android:drawable/ic_dialog_map"
+        custom:goneMarginStart="12dp"/>
 
     <Button
         android:id="@+id/textBar"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:background="#85d280"
-        android:text="some text bar 1234567"
-        android:gravity="center"
+        android:text="some text bar"
         custom:hasWeight="true"/>
 
     <ImageButton
@@ -41,7 +40,6 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_gravity="bottom"
-
         android:src="@android:drawable/ic_dialog_dialer"/>
 
     <ImageButton
@@ -49,7 +47,6 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_gravity="center_vertical"
-
         android:src="@android:drawable/ic_dialog_email"/>
 
     <ImageButton

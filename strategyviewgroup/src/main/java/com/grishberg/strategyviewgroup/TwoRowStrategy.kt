@@ -82,7 +82,7 @@ class TwoRowStrategy : LayoutStrategy {
             val lp = child.layoutParams as (BarViewGroup.LayoutParams)
 
             if (lp.hasWeight) {
-                child.layout(left, top, right, top + topViewHeight)
+                child.layout(left, parentTop, right, parentTop + topViewHeight)
                 continue
             }
 

@@ -9,5 +9,11 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <include layout="@layout/one_row_bar" />
+    <com.grishberg.barviewgroup.DraggableItemsList
+        android:id="@+id/draggableItems"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <include layout="@layout/two_row_bar" />
 </LinearLayout>
